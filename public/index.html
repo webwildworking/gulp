@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Template Gulp</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="css/style.min.css">
+    <link rel="icon" type="image/png" sizes="16x16" href="img/htmlicon.png">
+</head>
+<body>
+    <h1>Gulp</h1>
+    <ul class="command-list">
+        <li>npm init</li>
+        <li>npm install gulp --save-dev</li>
+        <li>npm install gulp-sass gulp-plumber gulp-postcss autoprefixer gulp-sourcemaps browser-sync gulp-rename gulp-imagemin gulp-webp gulp-svgstore gulp-posthtml posthtml-include del gulp-csso --save-dev</li>
+        <li></li>
+        <li></li>
+        <li></li>
+    </ul>
+    <h2>Gulpfile.js</h2>
+    <pre>
+        <code>
+            var gulp = require("gulp");
+            var sass = require("gulp-sass");
+            var plumber = require("gulp-plumber");
+            var postcss = require("gulp-postcss");
+            var autoprefixer = require("autoprefixer");
+            var browserSync = require("browser-sync").create();
+            var minify = require("gulp-csso");
+            var del = require("del");
+            var rename = require("gulp-rename");
+            var imagemin = require("gulp-imagemin");
+            var webp = require("gulp-webp");
+            var svgstore = require("gulp-svgstore");
+            var posthtml = require("gulp-posthtml");
+            var include = require("posthtml-include");
+
+
+            gulp.task("style", function () {
+            return gulp.src("source/sass/*.scss")
+            .pipe(plumber())
+            .pipe(sass())
+            .pipe(postcss([autoprefixer({
+            overrideBrowserslist:  ['last 3 versions'],
+            cascade: false
+            })]))
+            .pipe(gulp.dest("public/css"))
+            .pipe(minify())
+            .pipe(rename("style.min.css"))
+            .pipe(gulp.dest("public/css"));
+            });
+            gulp.task("clean", function () {
+            return del("public");
+            });
+            gulp.task("copy", function () {
+            return gulp.src([
+            "source/fonts/**/*.{woff,woff2}",
+            "source/img/**",
+            "source/js/**",
+            "source/*.html"
+            ], {
+            base: "source",
+            since: gulp.lastRun("copy")
+            })
+            .pipe(gulp.dest("public"));
+            });
+
+            gulp.task("watch", function () {
+            gulp.watch("source/sass/*.scss", gulp.series("style"));
+            gulp.watch("source", gulp.series("copy"));
+
+            });
+            gulp.task("build", gulp.series("clean",gulp.parallel("style", "copy")));
+            gulp.task("serve", function () {
+            browserSync.init({
+            server: "public"
+            });
+            browserSync.watch("public/**/*.*").on("change", browserSync.reload);
+            });
+
+            gulp.task("dev", gulp.series("build", gulp.parallel("watch", "serve")));
+        </code>
+    </pre>
+    <h2>GIT</h2>
+
+    <h3>Первичная настройка репозитория</h3>
+    <ol>
+        <li>git config --global user.name "Artem"</li>
+        <li>git - все команды гит начинаются с ключевого слова "git"</li>
+        <li>config - работа с конфигурацией гит</li>
+        <li>--global - ключ глобальной конфигурации</li>
+        <li>user.name - определяем имя пользователя</li>
+        <li>"Artem" - Наше имя в кавычках</li>
+        <li>git config --global user.email zakharrow.artem@gmail.com</li>
+        <li>Записывает имейл в глобальную конфигурацию (без кавычек)</li>
+        <li>git config --list</li>
+        <li>Выводит лист конфигураций</li>
+        <li>git config --global core.editor "'C:\Program Files\Sublime Text 3\sublime_text.exe' -multiInst -notabbar -nosession -noPlugin"</li>
+    </ol>
+
+    <h3>Игнорирование файлов в Git</h3>
+    <ol>
+        <li>Создаем в папке с репозиторием файл .gitignore с расширением All Files</li>
+        <li>В этом файле мы вписываем что требуется игнорировать: logs/ - будет игнорировать эту папку и все что в ней</li>
+        <li>В этом файле можно писать коментарии, коментарии начинаются с знака #</li>
+        <li>docs/*.txt - будет игнорировать только файлы с расширением txt</li>
+        <li>git init - создает репозиторий</li>
+        <li>git status - показывает текущий статус нашего проекта. Untracked files - файлы которые не под системой контроля</li>
+        <li>git add . - добавляет все неотслеживаемые файлы</li>
+        <li>git rm --cached filename.txt - удаляет файл из отслеживания</li>
+        <li>git commit -a -m"commit title" - "-a - вместо git add ." "-m - коментарий"</li>
+    </ol>
+
+</body>
+</html>
